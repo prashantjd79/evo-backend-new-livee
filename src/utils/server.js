@@ -14,11 +14,10 @@ connectDB();
 const app = express();
 const server = http.createServer(app)
 
-const onlineUsers = {}; // key = userId, value = { socketId, batchId, name, role }
-// SOCKET.IO SETUP
+const onlineUsers = {}; 
 const io = new Server(server, {
 	cors: {
-		origin: "*", // replace with frontend domain if needed
+		origin: "*", 
 		methods: ["GET", "POST"],
 	},
 });
@@ -31,7 +30,7 @@ io.on("connection", (socket) => {
 		console.log(`User ${socket.id} joined batch ${batchId}`);
 	});
 
-	// NEW: User comes online with details
+	
 	socket.on("userOnline", ({ userId, name, role, batchId }) => {
 		onlineUsers[userId] = {
 			socketId: socket.id,
@@ -40,9 +39,9 @@ io.on("connection", (socket) => {
 			role,
 		};
 
-		socket.join(batchId); // just in case
+		socket.join(batchId); 
 
-		// Broadcast updated online users in batch
+		
 		io.to(batchId).emit("onlineUsers", getOnlineUsers(batchId));
 	});
 
