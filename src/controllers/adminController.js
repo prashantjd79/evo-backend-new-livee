@@ -50,7 +50,29 @@ const generateApiKey = async (req, res) => {
   }
 };
 
+const removeApiKey = async (req, res) => {
+  try {
+    const adminId = req.admin?.id;
+    if (!adminId) {
+      return res.status(401).json({ message: 'Unauthorized: No admin ID' });
+    }
 
+    const { keyId } = req.body;
+    if (!keyId) {
+      return res.status(400).json({ message: 'Key ID is required' });
+    }
+
+    const key = await ApiKey.findByIdAndDelete(keyId);
+    if (!key) {
+      return res.status(404).json({ message: 'API key not found' });
+    }
+
+    res.status(200).json({ message: 'API key removed successfully' });
+  } catch (error) {
+    console.error('❌ Error removing API key:', error);
+    res.status(500).json({ message: 'Failed to remove API key' });
+  }
+};
 
 
 const deleteCourse = async (req, res) => {
@@ -1143,7 +1165,23 @@ const deleteReviewByAdmin = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-module.exports = { registerAdmin,deleteReviewByAdmin,updateReviewByAdmin,getStudentBatchesByAdmin,
+
+const listApiKeys = async (req, res) => {
+  try {
+    const adminId = req.admin?.id;
+    if (!adminId) {
+      return res.status(401).json({ message: 'Unauthorized: No admin ID' });
+    }
+    const keys = await ApiKey.find({ user: adminId }).select('key role active createdAt lastUsed');
+    res.status(200).json(keys);
+  } catch (error) {
+    console.error('❌ Error listing API keys:', error);
+    res.status(500).json({ message: 'Failed to list API keys' });
+  }
+};
+
+
+module.exports = { registerAdmin,deleteReviewByAdmin,updateReviewByAdmin,getStudentBatchesByAdmin,listApiKeys,
   updateAssignedMentorsToManager,updateAdminProfile,markTransactionAsPaid,
   toggleUserBanStatus,getUserProfileById,getAllReviews,getBatchStudents,
   getAssignmentByLessonId,deleteBatch,deleteCourse,deleteAnnouncement,
@@ -1155,5 +1193,5 @@ module.exports = { registerAdmin,deleteReviewByAdmin,updateReviewByAdmin,getStud
    getUsersByRole, getPlatformAnalytics, updateUserStatus,createTransaction,
    getAllTransactions, exportTransactionsCSV ,getAllJobs,getStudentsByCourseId,
    getUserTransactions,getAllBlogs,
-   assignMentorsToManager,getAllSubmittedAssignments,generateApiKey,
+   assignMentorsToManager,getAllSubmittedAssignments,generateApiKey,removeApiKey,
    getAllCertificates,getBatchesByCourseId};
