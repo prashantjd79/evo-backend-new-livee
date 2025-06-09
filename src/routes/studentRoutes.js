@@ -3,38 +3,39 @@ const { signupStudent,getMyCourseProgress,getStudentLessonSubmissions,updateStud
 const { studentProtect } = require("../middleware/authMiddleware");
 const uploadSubmittedAssignment = require("../middleware/uploadSubmittedAssignment");
 const uploadStudentPhoto = require("../middleware/uploadStudentPhoto");
+const { apiKeyProtect } = require('../middleware/authMiddleware');
 const router = express.Router();
 
 router.post("/signup", uploadStudentPhoto.single("photo"), signupStudent);
 router.post("/verify-otp", verifyOtp);
 router.post("/login", loginStudent);
-router.get("/me", studentProtect, getStudentProfile);
-router.get("/lessons/:courseId", studentProtect, getLessonsByCourseForStudent);
-router.get("/batches", studentProtect, getMyBatches);
-router.get("/batches/:batchId",studentProtect, getBatchById);
+router.get("/me", studentProtect,apiKeyProtect, getStudentProfile);
+router.get("/lessons/:courseId", studentProtect,apiKeyProtect, getLessonsByCourseForStudent);
+router.get("/batches", studentProtect,apiKeyProtect, getMyBatches);
+router.get("/batches/:batchId",studentProtect,apiKeyProtect, getBatchById);
 // router.post("/submit-assignment", studentProtect, submitAssignment);
 
 router.post(
   "/submit-assignment",
-  studentProtect,
+  studentProtect,apiKeyProtect,
   uploadSubmittedAssignment.single("file"),
   submitAssignment
 );
-router.get("/courses", studentProtect, getAllCoursesForStudents);
-router.get("/enrolled-courses", studentProtect, getMyEnrolledCourses);
+router.get("/courses", studentProtect,apiKeyProtect, getAllCoursesForStudents);
+router.get("/enrolled-courses", studentProtect,apiKeyProtect, getMyEnrolledCourses);
 
-router.post("/submit-quiz", studentProtect, submitQuiz);
-router.post("/apply-purchase", studentProtect, applyPromoCodeAndPurchase); 
-router.post("/course", studentProtect, enrollInCourse); // Student enrolls in a course
-router.post("/path", studentProtect, enrollInPath); // Student enrolls in a path
-router.get("/enroll/enrolled-courses/", studentProtect, getEnrolledCourses);
-router.get("/enrolled-paths", studentProtect, getEnrolledPaths);
-router.get("/certificates", studentProtect, getMyCertificates);
-router.get("/jobs", studentProtect, getApprovedJobsForStudents);
-router.get("/my-mentor-sessions", studentProtect, getMyMentorBookings);
-router.get("/my-applications", studentProtect, getStudentApplications);
-router.get("/my-progress", studentProtect, getMyCourseProgress);
-router.get("/scores/:lessonId", studentProtect, getStudentLessonScores);
-router.get("/lesson/:lessonId/submissions", studentProtect, getStudentLessonSubmissions);
-router.put("/profile", studentProtect, uploadStudentPhoto.single("photo"), updateStudentProfile);
+router.post("/submit-quiz", studentProtect,apiKeyProtect, submitQuiz);
+router.post("/apply-purchase", studentProtect,apiKeyProtect, applyPromoCodeAndPurchase); 
+router.post("/course", studentProtect,apiKeyProtect, enrollInCourse); // Student enrolls in a course
+router.post("/path", studentProtect,apiKeyProtect, enrollInPath); // Student enrolls in a path
+router.get("/enroll/enrolled-courses/", studentProtect,apiKeyProtect, getEnrolledCourses);
+router.get("/enrolled-paths", studentProtect,apiKeyProtect, getEnrolledPaths);
+router.get("/certificates", studentProtect,apiKeyProtect, getMyCertificates);
+router.get("/jobs", studentProtect,apiKeyProtect, getApprovedJobsForStudents);
+router.get("/my-mentor-sessions", studentProtect,apiKeyProtect, getMyMentorBookings);
+router.get("/my-applications", studentProtect,apiKeyProtect, getStudentApplications);
+router.get("/my-progress", studentProtect,apiKeyProtect, getMyCourseProgress);
+router.get("/scores/:lessonId", studentProtect,apiKeyProtect, getStudentLessonScores);
+router.get("/lesson/:lessonId/submissions", studentProtect,apiKeyProtect, getStudentLessonSubmissions);
+router.put("/profile", studentProtect,apiKeyProtect, uploadStudentPhoto.single("photo"), updateStudentProfile);
 module.exports = router;

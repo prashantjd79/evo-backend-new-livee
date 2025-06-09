@@ -1,6 +1,36 @@
 
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const ApiKey = require('../models/ApiKey');
+
+const apiKeyProtect = async (req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  if (!apiKey) {
+    return res.status(401).json({ message: 'Missing API key' });
+  }
+
+  try {
+    const keyData = await ApiKey.findOne({ key: apiKey });
+    if (!keyData || !keyData.active) {
+      return res.status(403).json({ message: 'Invalid or inactive API key' });
+    }
+    req.apiUser = keyData.user;
+    keyData.lastUsed = new Date();
+    await keyData.save();
+    next();
+  } catch (error) {
+    console.error('❌ Error validating API key:', error);
+    return res.status(500).json({ message: 'Server error during key validation' });
+  }
+};
+
+
+
+
+
+
+
+
 
 const protectMentor = (req, res, next) => {
   let token;
@@ -182,4 +212,4 @@ const courseCreatorProtect = (req, res, next) => {
 
 
 
-module.exports = { adminProtect, studentProtect,protectMentor,employerProtect,publisherProtect,courseCreatorProtect,managerProtect };
+module.exports = { adminProtect, studentProtect,protectMentor,employerProtect,publisherProtect,courseCreatorProtect,managerProtect,apiKeyProtect };

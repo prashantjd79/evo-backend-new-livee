@@ -22,6 +22,37 @@ const PromoCode = require("../models/PromoCode");
 const Ticket=require("../models/Ticket");
 const Announcement=require("../models/Announcement");
 const slugify = require("slugify");
+const { v4: uuidv4 } = require('uuid');
+const ApiKey =require("../models/ApiKey")
+
+const generateApiKey = async (req, res) => {
+  try {
+    const adminId = req.admin?.id; 
+    if (!adminId) {
+      return res.status(401).json({ message: 'Unauthorized: No admin ID' });
+    }
+
+    const newKey = `sk-${uuidv4()}`; 
+    const apiKey = await ApiKey.create({
+      key: newKey,
+      user: req.admin.id,
+      role: 'Admin',
+      active: true
+    });
+
+    res.status(201).json({
+      message: 'API key generated successfully',
+      apiKey: newKey
+    });
+  } catch (error) {
+    console.error('❌ Error generating API key:', error);
+    res.status(500).json({ message: 'Failed to generate API key' });
+  }
+};
+
+
+
+
 const deleteCourse = async (req, res) => {
   try {
     const { id } = req.params;
@@ -1112,7 +1143,17 @@ const deleteReviewByAdmin = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-module.exports = { registerAdmin,deleteReviewByAdmin,updateReviewByAdmin,getStudentBatchesByAdmin,updateAssignedMentorsToManager,updateAdminProfile,markTransactionAsPaid,toggleUserBanStatus,getUserProfileById,getAllReviews,getBatchStudents,getAssignmentByLessonId,deleteBatch,deleteCourse,deleteAnnouncement,deleteTicket,deletePromoCode,getAllStudentsProgress,addReviewByAdmin,getAdminProfile,getAllWannaBeInterests,getAllCourseCreators,getAllCourses,getAllSubcategories,getAllCategories,getMyAdminProfile,getCoursesWithDetails,loginAdmin,approveUser,
-   getPendingApprovals,approveMentor,getPendingMentors,getPendingApprovals ,getAllBatches,getUserProfile, approveOrRejectBlog,
+module.exports = { registerAdmin,deleteReviewByAdmin,updateReviewByAdmin,getStudentBatchesByAdmin,
+  updateAssignedMentorsToManager,updateAdminProfile,markTransactionAsPaid,
+  toggleUserBanStatus,getUserProfileById,getAllReviews,getBatchStudents,
+  getAssignmentByLessonId,deleteBatch,deleteCourse,deleteAnnouncement,
+  deleteTicket,deletePromoCode,getAllStudentsProgress,addReviewByAdmin,
+  getAdminProfile,getAllWannaBeInterests,getAllCourseCreators,getAllCourses,getAllSubcategories,
+  getAllCategories,getMyAdminProfile,getCoursesWithDetails,loginAdmin,approveUser,
+   getPendingApprovals,approveMentor,getPendingMentors,getPendingApprovals ,
+   getAllBatches,getUserProfile, approveOrRejectBlog,
    getUsersByRole, getPlatformAnalytics, updateUserStatus,createTransaction,
-   getAllTransactions, exportTransactionsCSV ,getAllJobs,getStudentsByCourseId,getUserTransactions,getAllBlogs,assignMentorsToManager,getAllSubmittedAssignments,getAllCertificates,getBatchesByCourseId};
+   getAllTransactions, exportTransactionsCSV ,getAllJobs,getStudentsByCourseId,
+   getUserTransactions,getAllBlogs,
+   assignMentorsToManager,getAllSubmittedAssignments,generateApiKey,
+   getAllCertificates,getBatchesByCourseId};
