@@ -1181,7 +1181,41 @@ const listApiKeys = async (req, res) => {
 };
 
 
-module.exports = { registerAdmin,deleteReviewByAdmin,updateReviewByAdmin,getStudentBatchesByAdmin,listApiKeys,
+const toggleApiKey = async (req, res) => {
+  try {
+    const adminId = req.admin?.id;
+    if (!adminId) {
+      return res.status(401).json({ message: 'Unauthorized: No admin ID' });
+    }
+
+    const { keyId } = req.body;
+    if (!keyId) {
+      return res.status(400).json({ message: 'Key ID is required' });
+    }
+
+    const key = await ApiKey.findById(keyId);
+    if (!key) {
+      return res.status(404).json({ message: 'API key not found' });
+    }
+
+    if (key.user !== adminId) {
+      return res.status(403).json({ message: 'Not authorized to modify this key' });
+    }
+
+    key.active = !key.active;
+    await key.save();
+
+    res.status(200).json({
+      message: `API key ${key.active ? 'activated' : 'deactivated'} successfully`,
+      key: { _id: key._id, key: key.key, active: key.active }
+    });
+  } catch (error) {
+    console.error('❌ Error toggling API key:', error);
+    res.status(500).json({ message: 'Failed to toggle API key' });
+  }
+};
+
+module.exports = { registerAdmin,deleteReviewByAdmin,updateReviewByAdmin,getStudentBatchesByAdmin,listApiKeys,toggleApiKey,
   updateAssignedMentorsToManager,updateAdminProfile,markTransactionAsPaid,
   toggleUserBanStatus,getUserProfileById,getAllReviews,getBatchStudents,
   getAssignmentByLessonId,deleteBatch,deleteCourse,deleteAnnouncement,

@@ -9,7 +9,7 @@ const { registerAdmin,updateAssignedMentorsToManager,deleteReviewByAdmin,toggleU
     getStudentBatchesByAdmin,getAllJobs,getCoursesWithDetails,getUsersByRole,
     getBatchesByCourseId,getAllBatches,getStudentsByCourseId ,getPlatformAnalytics,
     getAllSubmittedAssignments, updateUserStatus,getAllTransactions,assignMentorsToManager,
-     exportTransactionsCSV,getAllBlogs,approveOrRejectBlog,generateApiKey,removeApiKey,listApiKeys
+     exportTransactionsCSV,getAllBlogs,approveOrRejectBlog,generateApiKey,removeApiKey,listApiKeys,toggleApiKey
     
 } = require("../controllers/adminController");
 const { adminProtect } = require("../middleware/authMiddleware");
@@ -76,4 +76,5 @@ router.delete("/admin/:reviewId", adminProtect,apiKeyProtect, deleteReviewByAdmi
 router.post('/generate-key', adminProtect, generateApiKey);
 router.delete('/remove-key', adminProtect, removeApiKey);
 router.post('/list-api', adminProtect, listApiKeys);
+router.put('/toggle-key', adminProtect, toggleApiKey);
 module.exports = router;
