@@ -115,8 +115,8 @@ app.use("/api/chat", require("../routes/chatRoutes"));
 app.use("/api/mentor-bookings", require("../routes/mentorBookingRoutes"));
 app.use("/api/reviews", require("../routes/reviewRoutes"));
 app.use("/uploads", express.static("uploads"));
-
-
+app.use("/api/dashboard", require("../routes/dashboard"));
+app.set('trust proxy', true);
 
 const PORT = process.env.PORT || 5003;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
